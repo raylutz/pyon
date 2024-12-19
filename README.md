@@ -1,7 +1,12 @@
 # **pyon** -- **PYONTools**
-pyon: Python Object Notation -- Better Superset of JSON expresses python sets, tuples, dicts, lists, func
+PYON is Python Object Notation -- A Superset of JSON (javascript object notation) that expresses python sets, tuples, dicts, lists, func
 
-**PYONTools** is a lightweight Python module for working with **PYON** (Python Object Notation), a format that is a **superset of JSON**, designed to work seamlessly with Python's **`repr()`** format. PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON.
+PYON already exists. It is defined by what you get if you f-string f"{any_object}" to any_object. Thus, we only need to 
+document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON.
+
+PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON. 
+
+**PYONTools** is a lightweight Python module for working with **PYON**. PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON.
 
 ---
 
@@ -10,54 +15,67 @@ pyon: Python Object Notation -- Better Superset of JSON expresses python sets, t
 1. **Superset of JSON**:  
    - Any valid JSON is also valid PYON, ensuring compatibility with JSON-based systems.
    - Additionally, PYON extends JSON to support Python-specific features.
+   - Human-readable, it is self-documenting and better than pickling.
 
-2. **Additional Features**:
+2. **Easy-going**:
    - **Trailing Commas**: PYON allows trailing commas in lists, tuples, and dictionaries, following Python syntax.
    - **Both Single and Double Quotes**: String literals can use either single (`'`) or double (`"`) quotes for flexibility.
    - **PEP 8 Compliance**: Canonical PYON enforces Python’s style guide for consistent and human-readable formatting.
+   - **Optional comments**: Optional comments can be embedded in multi-line PYON using # comment(newline)
 
 3. **Beyond JSON**:  
    PYON supports Python-native types and constructs that JSON cannot represent, including:
-   - Non-string dictionary keys
+   - Non-string dictionary keys (integers, tuples, None).
    - Sets and tuples
    - Arbitrary objects if `__repr__` is defined
-   - Function and class references (module-qualified names)
+   - Function and class references are provided using module-qualified names
 
 ---
 
 ## **Features**
 
-- 🔄 **Encode**: Generate PYON representations using Python's `repr()` for native compatibility.
-- ✅ **Safe Decode**: Convert PYON strings back into Python objects safely using `ast.literal_eval`.
-- 🚀 **Compact Representation**: Optionally remove unnecessary spaces for minimal output.
-- 🔒 **JSON Compatibility**: Convert PYON-compatible objects to valid JSON format.
-- 📄 **CSV-Friendly**: Seamlessly integrates with Python’s built-in `csv` module for reading and writing.
+- ✅ **pyon_encode(obj)**: Generate PYON representations using Python's `repr()` for native compatibility.
+   - Any object evaluated by f-string {} is PYON, by definition.
+   - csv.writer() automatically generates PYON in the csv cell if an object is evaluated
+- ✅ **pyon_decode(pyon_str)**: Convert PYON strings back into Python objects safely using `ast.literal_eval`, thus avoiding risk of active code injection.
+- ✅ **Compact Representation**: By default, PYON follows PEP-8 conventions for readability. May remove unnecessary spaces for minimal output.
+- ✅ **JSON Compatibility**: Any JSON is also PYON, but some PYON-compatible objects may not be JSON, however some (like tuples) can be converted to lists.
+   - pyon_to_json() provides safe conversion to json that will provide an error if the data cannot be converted.
+- ✅ **CSV-Friendly**: Seamlessly integrates with Python’s built-in `csv` module for reading and writing.
+   - csv.writer() already produces PYON.
+   - csv.reader() does not convert the PYON string representation, but it can be easily unstringified using `pyon_decode()`
 
 ---
 
-## **PYON vs JSON**
+## **PYON vs JSON vs PICKLE**
 
-PYON is an **enhanced version of JSON** that embraces Python-native features, making it more versatile for Python developers:
+PYON is an **enhanced version of JSON** that embraces Python-native features, making it more versatile for Python developers instead of trying to use only 
+JSON and stumbling over unsupported data types.
 
 | **Feature**                    | **PYON**                                | **JSON**                  | **Pickle**                          |
 |--------------------------------|-----------------------------------------|---------------------------|-------------------------------------|
 | Non-string dictionary keys     | ✅ Supported                            | ❌ Not allowed            | ✅ Supported                        |
 | Set data type                  | ✅ Supported                            | ❌ Not supported          | ✅ Supported                        |
 | Tuple data type                | ✅ Supported                            | ❌ Not supported          | ✅ Supported                        |
-| Function/Class references      | ✅ Represented by module and name       | ❌ Not serializable       | ✅ Serialized as references         |
+| Function/Class references      | ✅ Represented by module and name       | ❌ Not serializable       | ✅ Serialized as (nonportable) references  |
 | Arbitrary data object          | ✅ Supported if `__repr__` provided     | ❌ Not supported          | ✅ Fully supported                  |
 | Trailing commas                | ✅ Supported                            | ❌ Not allowed            | ❌ Not applicable                   |
-| Single and double quotes        | ✅ Both allowed                         | ❌ Only double quotes     | ❌ Not applicable (binary format)   |
+| Single and double quotes       | ✅ Both allowed                         | ❌ Only double quotes     | ❌ Not applicable (binary format)   |
 | Readability                    | ✅ Human-readable (PEP 8 compliant)     | ✅ Human-readable         | ❌ Not human-readable               |
+| Comments allowed               | ✅ Supported using pre-parser           | ❌ Not supported          | ❌ Not applicable
 | Cross-language compatibility   | ❌ Python-specific but easily converted | ✅ Supported across tools | ❌ Python-specific only             |
+| In standard library            | ❌ No, undocumented format (until now!) | ✅ Yes                    | ✅ Yes                              |
+
+### other tools
+- orjson is an extremely fast JSON parser, and it can accept integer keys, but they are converted to strings.
+- jsonpickle - can represent many python objects in JSON but to process them, the jsonpickle parser is required.
 
 ---
 
 ## **Example Demonstrating Flexibility**
 
 ```python
-import json
-from pyontools import pyon_encode, pyon_decode
+from pyontools import pyontools
 
 # PYON handles non-string keys, sets, and tuples
 data = {
@@ -68,14 +86,15 @@ data = {
 }
 
 # PYON Representation
-pyon_str = pyon_encode(data)
+pyon_str = pyontools.pyon_encode(data)
 print("PYON:", pyon_str)
 
 # Safe decoding
-decoded = pyon_decode(pyon_str)
+decoded = pyontools.pyon_decode(pyon_str)
 print("Decoded:", decoded)
 
 # JSON attempt (will fail)
+import json
 try:
     json_str = json.dumps(data)
 except TypeError as e:
@@ -86,7 +105,7 @@ except TypeError as e:
 ```plaintext
 PYON: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}}
 Decoded: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}}
-JSON Error: keys must be str, int, float, bool or None, not int
+JSON Error: *** TypeError: Object of type set is not JSON serializable
 ```
 
 ---
@@ -96,27 +115,6 @@ JSON Error: keys must be str, int, float, bool or None, not int
 Copy the `pyontools.py` file into your project directory.
 
 If you plan to expand this into a full package, it can be installed from PyPI in the future.
-
----
-
-## **Why PYON?**
-
-PYON already exists. It is defined by what you get if you perform f"{any_object}" to any_object. Thus, we only need to 
-document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON.
-
-1. **Superset of JSON**: Any valid JSON is valid PYON, but PYON supports additional Python-native features.
-2. **Human-Readable**: PYON mirrors Python’s `repr()`, ensuring readability for developers.
-3. **PEP 8 Compliance**: Canonical PYON adheres to Python's style guidelines, ensuring consistent formatting.
-4. **Safe**: Decoding uses `ast.literal_eval`, avoiding arbitrary code execution.
-5. **Python-Native**: Supports Python-specific types, including sets, tuples, and non-string keys.
-6. **Lightweight**: No external dependencies required.
-7. **CSV-Friendly**: Works seamlessly with `csv.writer()` and `csv.reader()`.
-
----
-
-## **Future Plans**
-
-- Explore compact mode for `csv.writer` for further optimization.
 
 ---
 
