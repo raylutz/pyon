@@ -39,17 +39,17 @@ pyon: Python Object Notation -- Better Superset of JSON expresses python sets, t
 
 PYON is an **enhanced version of JSON** that embraces Python-native features, making it more versatile for Python developers:
 
-| **Feature**                    | **PYON**                                | **JSON**                  |
-|--------------------------------|-----------------------------------------|---------------------------|
-| Non-string dictionary keys     | ✅ Supported                            | ❌ Not allowed            |
-| Set data type                  | ✅ Supported                            | ❌ Not supported          |
-| Tuple data type                | ✅ Supported                            | ❌ Not supported          |
-| Function/Class references      | ✅ Represented by module and name       | ❌ Not serializable       |
-| Arbitrary data object          | ✅ Supported if `__repr__` provided     | ❌ Not supported          |
-| Trailing commas                | ✅ Supported                            | ❌ Not allowed            |
-| Single and double quotes        | ✅ Both allowed                         | ❌ Only double quotes     |
-| Readability                    | ✅ Human-readable (PEP 8 compliant)     | ✅ Human-readable         |
-| Cross-language compatibility   | ❌ Python-specific but easily converted | ✅ Supported across tools |
+| **Feature**                    | **PYON**                                | **JSON**                  | **Pickle**                          |
+|--------------------------------|-----------------------------------------|---------------------------|-------------------------------------|
+| Non-string dictionary keys     | ✅ Supported                            | ❌ Not allowed            | ✅ Supported                        |
+| Set data type                  | ✅ Supported                            | ❌ Not supported          | ✅ Supported                        |
+| Tuple data type                | ✅ Supported                            | ❌ Not supported          | ✅ Supported                        |
+| Function/Class references      | ✅ Represented by module and name       | ❌ Not serializable       | ✅ Serialized as references         |
+| Arbitrary data object          | ✅ Supported if `__repr__` provided     | ❌ Not supported          | ✅ Fully supported                  |
+| Trailing commas                | ✅ Supported                            | ❌ Not allowed            | ❌ Not applicable                   |
+| Single and double quotes        | ✅ Both allowed                         | ❌ Only double quotes     | ❌ Not applicable (binary format)   |
+| Readability                    | ✅ Human-readable (PEP 8 compliant)     | ✅ Human-readable         | ❌ Not human-readable               |
+| Cross-language compatibility   | ❌ Python-specific but easily converted | ✅ Supported across tools | ❌ Python-specific only             |
 
 ---
 
