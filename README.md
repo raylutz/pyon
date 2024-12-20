@@ -3,7 +3,7 @@
 # **pyon** -- **PYONTools**
 PYON is Python Object Notation -- A Superset of JSON (javascript object notation) that expresses python sets, tuples, dicts, lists, func
 
-PYON already exists. It is defined by what you get if you f-string f"{any_object}" to any_object. Thus, we only need to 
+PYON already exists. It is defined by what you get if you f-string f"{any_object}" to any_object, and is generally what you get with the `__repr__` method. Thus, we only need to 
 document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON.
 
 PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON. 
@@ -128,6 +128,8 @@ This project is licensed under the MIT License.
 
 ## **Future Plans**
 - Push for support of PYON within all functionality in the standard library, such as SQLite where JSON is supported but not PYON.
+- Enhance csv.writer to allow for compact mode, where spaces are not used after colons and commas (contrary to PEP8 formatting).
+- Enhance __repr__ output to allow, in general, to use double-quotes instead of single quotes. This makes PYON lists and dict compatible with JSON if only string keys are used.
 
 ---
 
