@@ -22,8 +22,8 @@ PYON provides safe and convenient methods for encoding, decoding, and compacting
 2. **Easy-going**:
    - **Trailing Commas**: PYON allows trailing commas in lists, tuples, and dictionaries, following Python syntax.
    - **Both Single and Double Quotes**: String literals can use either single (`'`) or double (`"`) quotes for flexibility.
-   - **PEP 8 Compliance**: Canonical PYON enforces Python’s style guide for consistent and human-readable formatting.
-   - **Optional comments**: Optional comments can be embedded in multi-line PYON using # comment(newline)
+   - **PEP 8 Compliance**: Canonical PYON enforces (much of) Python’s style guide with regard to formatting __REPR__ output, for consistent and human-readable formatting.
+   - **Optional comments**: Optional comments can be embedded in multi-line PYON using `# comment(newline)`
 
 3. **Beyond JSON**:  
    PYON supports Python-native types and constructs that JSON cannot represent, including:
@@ -37,9 +37,9 @@ PYON provides safe and convenient methods for encoding, decoding, and compacting
 ## **Features**
 
 - ✅ **pyon_encode(obj)**: Generate PYON representations using Python's `repr()` for native compatibility.
-   - Any object evaluated by f-string {} is PYON, by definition.
+   - Any object evaluated by f-string {} maybe suitable PYON, as long as it can be used to recreate the object.
    - csv.writer() automatically generates PYON in the csv cell if an object is evaluated
-- ✅ **pyon_decode(pyon_str)**: Convert PYON strings back into Python objects safely using `ast.literal_eval`, thus avoiding risk of active code injection.
+- ✅ **pyon_decode(pyon_str)**: Convert PYON strings back into Python objects safely, thus avoiding risk of active code injection.
 - ✅ **Compact Representation**: By default, PYON follows PEP-8 conventions for readability. May remove unnecessary spaces for minimal output.
 - ✅ **JSON Compatibility**: Any JSON is also PYON, but some PYON-compatible objects may not be JSON, however some (like tuples) can be converted to lists.
    - pyon_to_json() provides safe conversion to json that will provide an error if the data cannot be converted.
@@ -123,6 +123,11 @@ If you plan to expand this into a full package, it can be installed from PyPI in
 ## **License**
 
 This project is licensed under the MIT License.
+
+---
+
+## **Future Plans**
+- Push for support of PYON within all functionality in the standard library, such as SQLite where JSON is supported but not PYON.
 
 ---
 
