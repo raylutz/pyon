@@ -1,7 +1,7 @@
 <img src="pyonlogo.png">
 
 # **pyon** -- **PYONTools**
-PYON is Python Object Notation -- A Superset of JSON (javascript object notation) that expresses python sets, tuples, dicts, lists, func
+PYON is Python Object Notation -- A Superset of JSON (javascript object notation) that expresses python sets, tuples, dicts, lists, funcs, etc.
 
 PYON already exists. It is defined by what you get if you f-string f"{any_object}" to any_object, and is generally what you get with the `__repr__` method. Thus, we only need to 
 document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON.
