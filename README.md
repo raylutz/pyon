@@ -3,12 +3,15 @@
 # **pyon** -- **PYONTools**
 PYON is Python Object Notation -- A Superset of JSON (javascript object notation) that expresses python sets, tuples, dicts, lists, funcs, etc.
 
-PYON already exists. It is defined by what you get if you f-string f"{any_object}" to any_object, and is generally what you get with the `__repr__` method. Thus, we only need to 
-document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON.
+PYON already exists. It is defined by what you get if you `repr(any_object)`, and is generally what you get with the `__repr__` method. Thus, we only need to 
+document it, and provide some tools for working with it. Better than PICKLE, jsonpickle, and other variants of JSON that try to be JSON with extensions, but really
+miss the mark.
 
 PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON. 
 
 **PYONTools** is a lightweight Python module for working with **PYON**. PYON provides safe and convenient methods for encoding, decoding, and compacting Python-native objects, making it particularly useful when working with **CSV files**, **Python-native structures**, or ensuring **external compatibility** with tools like JSON.
+
+csv.writer() already produces PYON.
 
 ---
 
@@ -78,6 +81,8 @@ JSON and stumbling over unsupported data types.
 
 ```python
 from pyontools import pyontools
+import io
+import csv
 
 # PYON handles non-string keys, sets, and tuples
 data = {
@@ -85,11 +90,12 @@ data = {
     "set": {1, 2, 3},          # Set type
     "tuple": (1, 2, 3),        # Tuple type
     "nested": {"a": True, "b": [1, 2, 3]},
+    (1, 2): "tuple_key",       # tuple key
 }
 
 # PYON Representation
 pyon_str = pyontools.pyon_encode(data)
-print("PYON:", pyon_str)
+print(f'PYON: "{pyon_str}"')
 
 # Safe decoding
 decoded = pyontools.pyon_decode(pyon_str)
@@ -102,12 +108,44 @@ try:
 except TypeError as e:
     print("JSON Error:", e)
 ```
-
 **Output**:
+
 ```plaintext
-PYON: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}}
-Decoded: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}}
+PYON: "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"
+Decoded: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}
 JSON Error: *** TypeError: Object of type set is not JSON serializable
+```
+
+## csv.writer() already produces PYON:
+```
+lol = [['name', 'object'], ['example', data]]
+
+print(lol)
+# produces: [['name', 'object'], ['example', {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}]]
+
+f = io.StringIO(newline = '')
+csv_writer = csv.writer(f)
+csv_writer.writerows(lol)
+
+buff = f.getvalue()
+
+print(buff)
+
+sio = io.StringIO(buff)
+csv_reader = csv.reader(sio)
+data_lol = [row for row in csv_reader]
+
+obj_pyon = data_lol[1][1]
+obj_pyon
+# "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"
+
+obj = pyon_tools.pyon_decode(obj_pyon)
+obj
+# {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}
+
+obj.keys()
+# dict_keys([1, 'set', 'tuple', 'nested', (1, 2)])
+
 ```
 
 ---
@@ -130,6 +168,7 @@ This project is licensed under the MIT License.
 - Push for support of PYON within all functionality in the standard library, such as SQLite where JSON is supported but not PYON.
 - Enhance csv.writer to allow for compact mode, where spaces are not used after colons and commas (contrary to PEP8 formatting).
 - Enhance __repr__ output to allow, in general, to use double-quotes instead of single quotes. This makes PYON lists and dict compatible with JSON if only string keys are used.
+
 
 ---
 
