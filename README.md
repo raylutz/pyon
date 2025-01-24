@@ -83,6 +83,7 @@ JSON and stumbling over unsupported data types.
 from pyontools import pyontools
 import io
 import csv
+import pprint
 
 # PYON handles non-string keys, sets, and tuples
 data = {
@@ -95,11 +96,13 @@ data = {
 
 # PYON Representation
 pyon_str = pyontools.pyon_encode(data)
-print(f'PYON: "{pyon_str}"')
+print(f'PYON: "' + pyon_str + '"')
+# output: PYON: "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"
 
 # Safe decoding
 decoded = pyontools.pyon_decode(pyon_str)
 print("Decoded:", decoded)
+# output: Decoded: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}
 
 # JSON attempt (will fail)
 import json
@@ -107,21 +110,23 @@ try:
     json_str = json.dumps(data)
 except TypeError as e:
     print("JSON Error:", e)
-```
-**Output**:
 
-```plaintext
-PYON: "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"
-Decoded: {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}
-JSON Error: *** TypeError: Object of type set is not JSON serializable
+# output: JSON Error: *** TypeError: Object of type set is not JSON serializable
 ```
 
 ## csv.writer() already produces PYON:
 ```
 lol = [['name', 'object'], ['example', data]]
 
-print(lol)
-# produces: [['name', 'object'], ['example', {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}]]
+pprint.pp(lol)
+# produces:
+[['name', 'object'],
+ ['example',
+  {1: 'integer key',
+   'set': {1, 2, 3},
+   'tuple': (1, 2, 3),
+   'nested': {'a': True, 'b': [1, 2, 3]},
+   (1, 2): 'tuple_key'}]]
 
 f = io.StringIO(newline = '')
 csv_writer = csv.writer(f)
@@ -129,19 +134,37 @@ csv_writer.writerows(lol)
 
 buff = f.getvalue()
 
-print(buff)
+pprint.pp(buff)
+
+# produces:
+('name,object\r\n'
+ 'example,"{1: \'integer key\', \'set\': {1, 2, 3}, \'tuple\': (1, 2, 3), '
+ '\'nested\': {\'a\': True, \'b\': [1, 2, 3]}, (1, 2): \'tuple_key\'}"\r\n')
 
 sio = io.StringIO(buff)
 csv_reader = csv.reader(sio)
 data_lol = [row for row in csv_reader]
+
+pprint.pp(data_lol)
+
+# produces:
+[['name', 'object'],
+ ['example',
+  "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': "
+  "True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"]]
 
 obj_pyon = data_lol[1][1]
 obj_pyon
 # "{1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}"
 
 obj = pyon_tools.pyon_decode(obj_pyon)
-obj
-# {1: 'integer key', 'set': {1, 2, 3}, 'tuple': (1, 2, 3), 'nested': {'a': True, 'b': [1, 2, 3]}, (1, 2): 'tuple_key'}
+pprint.pp(obj)
+# produces:
+{1: 'integer key',
+ 'set': {1, 2, 3},
+ 'tuple': (1, 2, 3),
+ 'nested': {'a': True, 'b': [1, 2, 3]},
+ (1, 2): 'tuple_key'}
 
 obj.keys()
 # dict_keys([1, 'set', 'tuple', 'nested', (1, 2)])
